@@ -122,7 +122,7 @@ namespace CrubSqlConnection
                             idParam.Value = u.Id;
                             command.Parameters.Add(idParam);
                             command.ExecuteNonQuery();                            
-
+                            //esto ya no requiere de parametro
                             command.CommandText = "DELETE FROM dbo.Usuario WHERE UsuarioId = @id";                            
                             command.ExecuteNonQuery();                            
                         }
