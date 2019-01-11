@@ -114,19 +114,28 @@ namespace CrubSqlConnection
                 using (IDbConnection connection = CreateDBConnection()) {
                     using (IDbTransaction transaction = connection.BeginTransaction()) {
 
-                        using (IDbCommand command = connection.CreateCommand()) {
-                            command.Transaction = transaction; //le agregamos la transaccion
-                            command.CommandText = "DELETE FROM dbo.RolUsuario WHERE UsuarioId=@id";
-                            IDbDataParameter idParam = command.CreateParameter();
-                            idParam.ParameterName = "id";
-                            idParam.Value = u.Id;
-                            command.Parameters.Add(idParam);
-                            command.ExecuteNonQuery();                            
-                            //esto ya no requiere de parametro
-                            command.CommandText = "DELETE FROM dbo.Usuario WHERE UsuarioId = @id";                            
-                            command.ExecuteNonQuery();                            
+                        try
+                        {
+                            using (IDbCommand command = connection.CreateCommand())
+                            {
+                                command.Transaction = transaction; //le agregamos la transaccion
+                                command.CommandText = "DELETE FROM dbo.RolUsuario WHERE UsuarioId=@id";
+                                IDbDataParameter idParam = command.CreateParameter();
+                                idParam.ParameterName = "id";
+                                idParam.Value = u.Id;
+                                command.Parameters.Add(idParam);
+                                command.ExecuteNonQuery();
+                                //esto ya no requiere de parametro
+                                command.CommandText = "DELETE FROM dbo.Usuario WHERE UsuarioId = @id";
+                                command.ExecuteNonQuery();
+                            }
+                            transaction.Commit(); //realiza el commit de la trasaccion
                         }
-                        transaction.Commit(); //realiza el commit de la trasaccion
+                        catch (Exception)
+                        {
+                            transaction.Rollback(); //si falla algo realizamos el rollback
+                        }
+                       
                     }
 
                 }
